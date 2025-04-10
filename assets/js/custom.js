@@ -1,4 +1,4 @@
-const baseUrl = "backend_url";
+const baseUrl = "http://127.0.0.1:9000/security";
 
 const validateProfile = (file, supported) =>{
     if(file.name){
@@ -13,10 +13,11 @@ const validateProfile = (file, supported) =>{
 const post = (payload) =>{
     return {
             method:"POST",
-            headers:{
-                "Content-type": "application/json",
-            },
-            body:JSON.stringify(payload)
+            //sending request without the header
+            // headers:{
+            //     "Content-type": "application/json",
+            // },
+            body:payload
     }
 }
 
@@ -48,7 +49,6 @@ const handleRegistration = (event) =>{
     const profile = formData.get("profile")
 
 
-    
 
     if(firstname.trim() === "" || lastname.trim() === "" || email.trim() === "" || department.trim() === ""|| level.trim() === "" || matric.trim() === ""|| password.trim() === "" || confirmPass.trim() === ""){
         warningLabel("ensure all the fields are filled")
@@ -68,12 +68,11 @@ const handleRegistration = (event) =>{
             level: level,
             matric: matric,
             password: password,
-            profile: profile
         }
-        console.log(data)
-        submitRegistrationForm(data, event)
+        formData.append("student_details", JSON.stringify(data))
+        formData.append("file", profile)
+        submitRegistrationForm(formData, event)
     }
-
     
 }
 
@@ -93,8 +92,10 @@ const handleLogin = (event) =>{
             matric:matric,
             password:password
         }
-        console.log(data)
-        // submitLoinForm(data, event)
+        formData.append("student_details", JSON.stringify(
+            data
+        ))
+        submitLoinForm(formData, event)
     }
 }
 
@@ -120,6 +121,7 @@ const submitRegistrationForm = async (payload, event) =>{
             const data = await fetchData.json()
             event.target.reset()
             // navigate to login page
+            console.log(data)
         }
         else{
             throw new Error("error submitting form")
@@ -137,6 +139,7 @@ const submitLoinForm = async (payload, event) =>{
         if(fetchData.ok){
             const data = await fetchData.json()
             event.target.reset()
+            warningLabel("welcome student")
             //naivgate to dashboard
         }
         else{
